@@ -9,11 +9,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/grafana/agent/pkg/loki"
-	"github.com/grafana/agent/pkg/tempo/automaticloggingprocessor"
-	"github.com/grafana/agent/pkg/tempo/noopreceiver"
-	"github.com/grafana/agent/pkg/tempo/promsdprocessor"
-	"github.com/grafana/agent/pkg/tempo/remotewriteexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/loadbalancingexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanmetricsprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor"
@@ -32,6 +27,13 @@ import (
 	"go.opentelemetry.io/collector/receiver/opencensusreceiver"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 	"go.opentelemetry.io/collector/receiver/zipkinreceiver"
+
+	"github.com/grafana/agent/pkg/loki"
+	"github.com/grafana/agent/pkg/tempo/automaticloggingprocessor"
+	"github.com/grafana/agent/pkg/tempo/eventloggingprocessor"
+	"github.com/grafana/agent/pkg/tempo/noopreceiver"
+	"github.com/grafana/agent/pkg/tempo/promsdprocessor"
+	"github.com/grafana/agent/pkg/tempo/remotewriteexporter"
 )
 
 const (
@@ -133,6 +135,9 @@ type InstanceConfig struct {
 
 	// TailSampling defines a sampling strategy for the pipeline
 	TailSampling *tailSamplingConfig `yaml:"tail_sampling"`
+
+	// EventLogging
+	EventLogging *eventloggingprocessor.EventLoggingConfig `yaml:"event_logging,omitempty"`
 }
 
 const (
@@ -481,6 +486,13 @@ func (c *InstanceConfig) otelConfig() (*configmodels.Config, error) {
 		processorNames = append(processorNames, "batch")
 	}
 
+	if c.EventLogging != nil {
+		processorNames = append(processorNames, eventloggingprocessor.TypeStr)
+		processors[eventloggingprocessor.TypeStr] = map[string]interface{}{
+			"event_logging": c.EventLogging,
+		}
+	}
+
 	pipelines := make(map[string]interface{})
 	if c.SpanMetrics != nil {
 		// Configure the metrics exporter.
@@ -664,6 +676,7 @@ func tracingFactories() (component.Factories, error) {
 		spanmetricsprocessor.NewFactory(),
 		automaticloggingprocessor.NewFactory(),
 		tailsamplingprocessor.NewFactory(),
+		eventloggingprocessor.NewFactory(),
 	)
 	if err != nil {
 		return component.Factories{}, err
@@ -686,7 +699,8 @@ func orderProcessors(processors []string, splitPipelines bool) [][]string {
 		"spanmetrics":       1,
 		"tail_sampling":     2,
 		"automatic_logging": 3,
-		"batch":             4,
+		"event_logging":     4,
+		"batch":             5,
 	}
 
 	sort.Slice(processors, func(i, j int) bool {
