@@ -96,7 +96,7 @@ require (
 	go.uber.org/zap v1.21.0
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	golang.org/x/sys v0.0.0-20220222172238-00053529121e
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.47.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
@@ -208,7 +208,7 @@ require (
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/ema/qdisc v0.0.0-20200603082823-62d0308e3e00 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
+	github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.6 // indirect
 	github.com/euank/go-kmsg-parser v2.0.0+incompatible // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
