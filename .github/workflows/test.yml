@@ -30,7 +30,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
     - name: Increase pagefile
-      uses: al-cheb/configure-pagefile-action@v1.2
+      uses: al-cheb/configure-pagefile-action@v1.3
       # Tests on Windows can use a lot of memory, and we need to increase the
       # pagefile to compensate.
       with:
